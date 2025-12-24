@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, ViewChild, computed, effect, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ViewChild, effect, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { CdkVirtualScrollViewport, ScrollingModule } from '@angular/cdk/scrolling';
 import { MatListModule } from '@angular/material/list';
@@ -15,16 +15,7 @@ import { ImagesActions } from '../../store/images/images.actions';
   standalone: true,
   imports: [CommonModule, ScrollingModule, MatListModule, MatProgressBarModule, MatIconModule],
   templateUrl: './results-list.component.html',
-  styles: [`
-    .results-container { position: relative; height: calc(100vh - 200px); }
-    .viewport { height: 100%; width: 100%; border-radius: 8px; border: 1px solid rgba(0,0,0,0.06); background: white; }
-    .row { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-bottom: 1px solid rgba(0,0,0,0.04); cursor: pointer; }
-    .row:hover { background: rgba(0,0,0,0.02); }
-    .avatar { width: 40px; height: 40px; display: grid; place-items: center; background: #f3f5f7; border-radius: 8px; color: #607d8b; }
-    .meta { overflow: hidden; }
-    .title { font-weight: 600; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }
-    .subtitle { font-size: 12px; color: rgba(0,0,0,0.6); }
-  `],
+  styleUrls: ['./results-list.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ResultsListComponent  {

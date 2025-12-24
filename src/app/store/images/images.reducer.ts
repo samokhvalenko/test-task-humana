@@ -5,7 +5,7 @@ import { ImagesActions } from './images.actions';
 export const imagesFeatureKey = 'images';
 
 export interface ImageItem {
-  id: string; // itemId
+  id: string;
   large: string;
   medium: string;
   thumbnail: string;

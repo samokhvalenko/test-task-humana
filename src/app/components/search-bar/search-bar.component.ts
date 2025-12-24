@@ -18,12 +18,7 @@ import { startWith } from 'rxjs';
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, MatFormFieldModule, MatInputModule, MatAutocompleteModule, MatChipsModule, MatIconModule],
   templateUrl: './search-bar.component.html',
-  styles: [`
-    .search-container { display: flex; flex-direction: column; gap: 8px; }
-    .search-field { width: 100%; }
-    .suggestions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-    .label { font-size: 12px; color: rgba(0,0,0,0.6); }
-  `],
+  styleUrls: ['./search-bar.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class SearchBarComponent {

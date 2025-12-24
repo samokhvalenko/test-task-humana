@@ -41,7 +41,6 @@ export const reducer = createReducer(
   initialState,
   on(SearchActions.typeaheadChanged, (state, { term }) => ({
     ...state,
-    // update the term only; do not toggle loading here to avoid excessive re-renders on each keystroke
     results: { ...state.results, term }
   })),
   on(SearchActions.searchRequested, (state, { term, offset }) => ({

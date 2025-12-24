@@ -3,7 +3,7 @@ import { Injectable, inject } from '@angular/core';
 import { Observable, map } from 'rxjs';
 
 export interface DataUsaSearchItem {
-  id: string; // derived stable id
+  id: string;
   name: string;
   type: string;
   slug?: string;
@@ -18,7 +18,6 @@ export class DataUsaService {
   private readonly http = inject(HttpClient);
   private readonly base = 'https://datausa.io/api';
 
-  // Search endpoint documented as /search/?q= with optional limit/offset
   search(term: string, offset = 0, limit = 50): Observable<DataUsaSearchItem[]> {
     const url = `${this.base}/search/?q=${encodeURIComponent(term)}&offset=${offset}&limit=${limit}`;
     return this.http.get<DataUsaSearchResponse>(url).pipe(
@@ -34,7 +33,6 @@ export class DataUsaService {
     );
   }
 
-  // Example population data (not directly used for search but available for future expansion)
   populationNation(): Observable<any> {
     const url = `${this.base}/data?drilldowns=Nation&measures=Population`;
     return this.http.get(url);

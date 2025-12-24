@@ -1,0 +1,22 @@
+<div class="dialog-container">
+  <div class="header">
+    <h3>Shape Editor - {{ data.seed }}</h3>
+    <button mat-stroked-button color="primary" (click)="close()">Close</button>
+  </div>
+
+  <div class="canvas-wrap" #wrap>
+    <img #img [src]="imageUrl" (load)="onImageLoad()" alt="image" />
+    <canvas #canvas></canvas>
+  </div>
+
+  <div class="controls">
+    <button mat-raised-button color="primary" (click)="startNewPolygon()">Start New Polygon</button>
+    <button mat-stroked-button (click)="clearPolygon()">Clear</button>
+    <div class="slider">
+      <span>Rotate</span>
+      <input type="range" min="-180" max="180" step="1" [value]="angle" (input)="onAngleInput($event)" />
+      <span>{{ angle }}°</span>
+    </div>
+  </div>
+  <p class="hint">Click to add points. Drag inside polygon to move. Use slider to rotate. Polygon persists per item.</p>
+</div>

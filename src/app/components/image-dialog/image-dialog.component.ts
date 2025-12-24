@@ -1,4 +1,4 @@
-import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, Inject, OnDestroy, ViewChild, inject } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, Inject, OnDestroy, ViewChild, inject, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
@@ -8,8 +8,6 @@ import { AppState } from '../../store';
 import { PolygonsActions, PointN } from '../../store/polygons/polygons.actions';
 import { selectImageEntities } from '../../store/images/images.reducer';
 import { selectPolygonEntities } from '../../store/polygons/polygons.reducer';
-import { map, takeUntil } from 'rxjs/operators';
-import { Subject } from 'rxjs';
 
 export interface ImageDialogData {
   itemId: string;
@@ -20,45 +18,12 @@ export interface ImageDialogData {
   selector: 'app-image-dialog',
   standalone: true,
   imports: [CommonModule, MatDialogModule, MatButtonModule, MatSliderModule],
-  template: `
-    <div class="dialog-container">
-      <div class="header">
-        <h3>Shape Editor - {{ data.seed }}</h3>
-        <button mat-stroked-button color="primary" (click)="close()">Close</button>
-      </div>
-
-      <div class="canvas-wrap" #wrap>
-        <img #img [src]="imageUrl" (load)="onImageLoad()" alt="image" />
-        <canvas #canvas></canvas>
-      </div>
-
-      <div class="controls">
-        <button mat-raised-button color="primary" (click)="startNewPolygon()">Start New Polygon</button>
-        <button mat-stroked-button (click)="clearPolygon()">Clear</button>
-        <div class="slider">
-          <span>Rotate</span>
-          <input type="range" min="-180" max="180" step="1" [value]="angle" (input)="onAngleInput($event)" />
-          <span>{{ angle }}°</span>
-        </div>
-      </div>
-      <p class="hint">Click to add points. Drag inside polygon to move. Use slider to rotate. Polygon persists per item.</p>
-    </div>
-  `,
-  styles: [`
-    .dialog-container { width: min(90vw, 900px); max-width: 95vw; }
-    .header { display:flex; align-items:center; justify-content: space-between; margin-bottom: 8px; }
-    .canvas-wrap { position: relative; width: 100%; aspect-ratio: 4/3; background: #111; border-radius: 8px; overflow: hidden; }
-    img { position:absolute; inset:0; width:100%; height:100%; object-fit: contain; }
-    canvas { position:absolute; inset:0; width:100%; height:100%; }
-    .controls { display:flex; align-items:center; gap: 12px; margin-top: 8px; flex-wrap: wrap; }
-    .slider { display:flex; align-items:center; gap:8px; min-width: 240px; }
-    .hint { color: rgba(0,0,0,0.6); font-size: 12px; margin-top: 6px; }
-  `],
+  templateUrl: './image-dialog.component.html',
+  styleUrls: ['./image-dialog.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ImageDialogComponent implements AfterViewInit, OnDestroy {
   private readonly store = inject<Store<AppState>>(Store as any);
-  private readonly destroy$ = new Subject<void>();
 
   @ViewChild('canvas') canvasRef!: ElementRef<HTMLCanvasElement>;
   @ViewChild('wrap') wrapRef!: ElementRef<HTMLDivElement>;
@@ -70,23 +35,28 @@ export class ImageDialogComponent implements AfterViewInit, OnDestroy {
   private dragging = false;
   private lastPos: { x: number; y: number } | null = null;
 
+  private imageEntities = this.store.selectSignal(selectImageEntities);
+  private polygonEntities = this.store.selectSignal(selectPolygonEntities);
+
   constructor(
     private dialogRef: MatDialogRef<ImageDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: ImageDialogData
   ) {
-    // Load image URL from store
-    this.store.select(selectImageEntities).pipe(
-      map(entities => entities[data.itemId]?.large || entities[data.itemId]?.medium || entities[data.itemId]?.thumbnail || ''),
-      takeUntil(this.destroy$)
-    ).subscribe(url => this.imageUrl = url);
+    effect(() => {
+      const ents = this.imageEntities();
+      const id = this.data.itemId;
+      const pic = ents?.[id];
+      const url = pic?.large || pic?.medium || pic?.thumbnail || '';
+      if (url !== this.imageUrl) this.imageUrl = url;
+    });
 
-    // Load polygon from store
-    this.store.select(selectPolygonEntities).pipe(
-      map(entities => entities[data.itemId]),
-      takeUntil(this.destroy$)
-    ).subscribe(poly => {
-      this.points = poly?.points ?? [];
-      this.angle = poly?.angleDeg ?? 0;
+    effect(() => {
+      const ents = this.polygonEntities();
+      const poly = ents?.[this.data.itemId];
+      const pts = poly?.points ?? [];
+      const ang = poly?.angleDeg ?? 0;
+      this.points = pts;
+      this.angle = ang;
       this.render();
     });
   }
@@ -101,8 +71,6 @@ export class ImageDialogComponent implements AfterViewInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
     const canvas = this.canvasRef?.nativeElement;
     if (canvas) canvas.removeEventListener('mousedown', this.onDown);
     window.removeEventListener('mousemove', this.onMove);

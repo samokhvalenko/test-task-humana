@@ -1,0 +1,18 @@
+<div class="search-container">
+  <mat-form-field appearance="outline" class="search-field">
+    <mat-label>Search Data USA</mat-label>
+    <input type="text" matInput [formControl]="ctrl" placeholder="Type to search..." [matAutocomplete]="auto" />
+    <mat-icon matSuffix>search</mat-icon>
+  </mat-form-field>
+
+  <mat-autocomplete #auto="matAutocomplete" (optionSelected)="onOptionSelected($event.option.value)">
+    <mat-option *ngFor="let s of filteredSuggestions()" [value]="s">{{ s }}</mat-option>
+  </mat-autocomplete>
+
+  <div class="suggestions">
+    <span class="label">Recent:</span>
+    <mat-chip-set>
+      <mat-chip *ngFor="let s of suggestions()" (click)="setTerm(s)" color="primary" selected>{{ s }}</mat-chip>
+    </mat-chip-set>
+  </div>
+</div>

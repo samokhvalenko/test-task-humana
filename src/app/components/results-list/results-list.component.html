@@ -1,0 +1,12 @@
+<div class="results-container">
+  <mat-progress-bar *ngIf="loading()" mode="indeterminate"></mat-progress-bar>
+  <cdk-virtual-scroll-viewport itemSize="72" class="viewport" (scrolledIndexChange)="onScrolled($event)" #viewport>
+    <div class="row" *cdkVirtualFor="let item of results(); trackBy: trackById" (click)="open(item.id, item.name)">
+      <div class="avatar"><mat-icon>image</mat-icon></div>
+      <div class="meta">
+        <div class="title">{{ item.name }}</div>
+        <div class="subtitle">{{ item.type }}</div>
+      </div>
+    </div>
+  </cdk-virtual-scroll-viewport>
+</div>

@@ -3,7 +3,6 @@ import { adapter, searchFeature } from './search.reducer';
 
 export const selectResultsState = createSelector(searchFeature.selectResults, s => s);
 
-// Use NgRx Entity memoized selectors to avoid recreating arrays on every state change
 const entitySelectors = adapter.getSelectors();
 export const selectAllResults = createSelector(searchFeature.selectResults, (s) => entitySelectors.selectAll(s));
 export const selectResultsEntities = createSelector(searchFeature.selectResults, s => s.entities);
@@ -14,7 +13,6 @@ export const selectSuggestions = searchFeature.selectSuggestions;
 
 export const selectItemById = (id: string) => createSelector(selectResultsEntities, (ents) => ents[id]);
 
-// Additional suggestion helper: break previous queries into unique words
 export const selectWordSuggestions = createSelector(selectSuggestions, (queries) => {
   const words = new Set<string>();
   for (const q of queries) {
