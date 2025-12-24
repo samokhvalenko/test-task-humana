@@ -5,7 +5,7 @@
   </div>
 
   <div class="canvas-wrap" #wrap>
-    <img #img [src]="imageUrl" (load)="onImageLoad()" alt="image" />
+    <img #img [src]="imageUrl()" (load)="onImageLoad()" alt="image" />
     <canvas #canvas></canvas>
   </div>
 

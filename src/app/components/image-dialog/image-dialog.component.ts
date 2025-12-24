@@ -1,4 +1,4 @@
-import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, Inject, OnDestroy, ViewChild, inject, effect } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, Inject, OnDestroy, ViewChild, inject, effect, computed, Signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
@@ -29,7 +29,7 @@ export class ImageDialogComponent implements AfterViewInit, OnDestroy {
   @ViewChild('wrap') wrapRef!: ElementRef<HTMLDivElement>;
   @ViewChild('img') imgRef!: ElementRef<HTMLImageElement>;
 
-  imageUrl = '';
+  imageUrl!: Signal<string>;
   points: PointN[] = [];
   angle = 0;
   private dragging = false;
@@ -42,12 +42,11 @@ export class ImageDialogComponent implements AfterViewInit, OnDestroy {
     private dialogRef: MatDialogRef<ImageDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: ImageDialogData
   ) {
-    effect(() => {
+    this.imageUrl = computed(() => {
       const ents = this.imageEntities();
       const id = this.data.itemId;
       const pic = ents?.[id];
-      const url = pic?.large || pic?.medium || pic?.thumbnail || '';
-      if (url !== this.imageUrl) this.imageUrl = url;
+      return pic?.large || pic?.medium || pic?.thumbnail || '';
     });
 
     effect(() => {
